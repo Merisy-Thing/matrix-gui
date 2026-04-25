@@ -10,7 +10,7 @@ An immediate-mode embedded GUI framework inspired by [kolibri-embedded-gui](http
 
 ## Features
 
-- **Immediate-mode GUI**: Simple and intuitive API with minimal boilerplate
+- **Immediate-mode GUI**: Lightweight, customizable, and low-footprint
 - **Zero-allocation design**: Except for control state values, all data resides on the stack, suitable for resource-constrained systems
 - **Region-based layout**: Flexible free-form layout with predefined rectangular regions, providing layout design tools (Matrix GUI Layout)
 - **Feature-based modularity**: Enable only the features you need to minimize binary size
@@ -117,6 +117,8 @@ cargo run --features part --example basic-example
 cargo run --features anim --example anim-by-ui
 cargo run --features popup,part --example msg-box
 ```
+
+## [Documents](https://docs.rs/matrix-gui/latest/matrix_gui/#modules)
 
 ## License
 
