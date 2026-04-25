@@ -74,38 +74,6 @@ Add this to your `Cargo.toml`:
 matrix-gui = "0.1.0"
 ```
 
-### Basic Example
-
-```rust
-use matrix_gui::prelude::*;
-use embedded_graphics::pixelcolor::Rgb565;
-
-// Define regions using macro
-matrix_gui::free_form_region!(
-    RegionId,
-    (TITLE, 100, 6, 143, 24),
-    (BUTTON, 20, 85, 61, 24),
-    (LABEL, 19, 34, 130, 20),
-);
-
-fn main() {
-    // Create display and UI context
-    let mut display = SimulatorDisplay::<Rgb565>::new(Size::new(320, 240));
-    let smartstates = RenderState::new_array::<REGIONID_COUNT>();
-    let widget_states = WidgetStates::new(&smartstates);
-    let style = rgb565_light_style();
-
-    let mut ui = Ui::new_fullscreen(&mut display, &widget_states, &style);
-
-    // Add widgets
-    ui.add(Label::new(&Region::TITLE, "Hello World"));
-    ui.add(Button::new(&Region::BUTTON, "Click Me"));
-
-    // Handle interactions
-    ui.interact(Interaction::Pressed(Point::new(100, 100)));
-}
-```
-
 ## Features
 
 This library uses Cargo features to enable optional functionality. By default, no features are enabled, allowing you to choose exactly what you need.
@@ -125,75 +93,6 @@ This library uses Cargo features to enable optional functionality. By default, n
 | `part` | Core feature bundle | `log`, `focus`, `debug-color`, `interaction`, `framebuffer` |
 | `all` | Enable all features | `part`, `fill-rect`, `popup` |
 | `anim` | Animation feature bundle | `animation`, `part` |
-
-### Feature Details
-
-#### `interaction`
-
-Enables user interaction support including touch/mouse input and interactive widgets.
-
-**Enables:**
-- `Interaction` enum (Pressed, Drag, Release, Click)
-- Interactive widgets (Button, Checkbox, RadioButton, Slider)
-- Region collision detection
-- Event handling
-
-#### `focus`
-
-Enables keyboard focus management for navigation and keyboard input.
-
-**Dependencies:** `interaction`
-
-**Enables:**
-- `FocusState` focus state management
-- `FocusTracker` focus tracking
-- `Focused` enum (No, Yes, Trigger)
-- Keyboard navigation support
-
-#### `animation`
-
-Enables a lightweight animation system using integer-only math.
-
-**Enables:**
-- `Anim` animation definition
-- `Easing` functions (Linear, EaseIn, EaseOut, EaseInOut)
-- `AnimManager` animation manager
-- Fixed-point arithmetic (no floating-point operations)
-
-#### `popup`
-
-Enables modal dialog support.
-
-**Enables:**
-- `Modal` widget
-- `MessageBox` widget
-- Modal state management
-
-#### `framebuffer`
-
-Enables off-screen rendering support for double buffering and complex widget caching.
-
-**Enables:**
-- `WidgetFramebuf` framebuffer widget
-- Off-screen rendering capabilities
-- Buffer management
-
-#### `fill-rect`
-
-Enables direct fast rectangle filling.
-
-**Enables:**
-- `fill_with_color()` color filling
-- `fill_with_buffer()` buffer filling
-
-#### `debug-color`
-
-Enables debug color visualization for development and layout verification.
-
-**Enables:**
-- Region boundary drawing
-- Debug information display
-- Development helper tools
 
 ## Layout Tools
 
