@@ -74,38 +74,6 @@
 matrix-gui = "0.1.0"
 ```
 
-### 基础示例
-
-```rust
-use matrix_gui::prelude::*;
-use embedded_graphics::pixelcolor::Rgb565;
-
-// 使用宏定义区域
-matrix_gui::free_form_region!(
-    RegionId,
-    (TITLE, 100, 6, 143, 24),
-    (BUTTON, 20, 85, 61, 24),
-    (LABEL, 19, 34, 130, 20),
-);
-
-fn main() {
-    // 创建显示和UI上下文
-    let mut display = SimulatorDisplay::<Rgb565>::new(Size::new(320, 240));
-    let smartstates = RenderState::new_array::<REGIONID_COUNT>();
-    let widget_states = WidgetStates::new(&smartstates);
-    let style = rgb565_light_style();
-
-    let mut ui = Ui::new_fullscreen(&mut display, &widget_states, &style);
-
-    // 添加widgets
-    ui.add(Label::new(&Region::TITLE, "Hello World"));
-    ui.add(Button::new(&Region::BUTTON, "Click Me"));
-
-    // 处理交互
-    ui.interact(Interaction::Pressed(Point::new(100, 100)));
-}
-```
-
 ## 功能特性
 
 本库使用Cargo功能来启用可选功能。默认情况下，不启用任何功能，允许您精确选择所需的功能。
@@ -125,75 +93,6 @@ fn main() {
 | `part` | 核心功能包 | `log`, `focus`, `debug-color`, `interaction`, `framebuffer` |
 | `all` | 启用所有功能 | `part`, `fill-rect`, `popup` |
 | `anim` | 动画功能包 | `animation`, `part` |
-
-### 功能详解
-
-#### `interaction`
-
-启用用户交互支持，包括触摸/鼠标输入和交互式widgets。
-
-**启用功能：**
-- `Interaction` 枚举（Pressed、Drag、Release、Click）
-- 交互式widgets（Button、Checkbox、RadioButton、Slider）
-- 区域碰撞检测
-- 事件处理
-
-#### `focus`
-
-启用键盘焦点管理，用于导航和键盘输入。
-
-**依赖：** `interaction`
-
-**启用功能：**
-- `FocusState` 焦点状态管理
-- `FocusTracker` 焦点跟踪
-- `Focused` 枚举（No、Yes、Trigger）
-- 键盘导航支持
-
-#### `animation`
-
-启用使用纯整数数学的轻量级动画系统。
-
-**启用功能：**
-- `Anim` 动画定义
-- `Easing` 函数（Linear、EaseIn、EaseOut、EaseInOut）
-- `AnimManager` 动画管理器
-- 定点算术（无浮点运算）
-
-#### `popup`
-
-启用模态对话框支持。
-
-**启用功能：**
-- `Modal` widget
-- `MessageBox` widget
-- 模态状态管理
-
-#### `framebuffer`
-
-启用离屏渲染支持，用于双缓冲和复杂widget缓存。
-
-**启用功能：**
-- `WidgetFramebuf` 帧缓冲widget
-- 离屏渲染能力
-- 缓冲区管理
-
-#### `fill-rect`
-
-启用直接的快速矩形填充。
-
-**启用功能：**
-- `fill_with_color()` 颜色填充
-- `fill_with_buffer()` 缓冲区填充
-
-#### `debug-color`
-
-启用调试颜色可视化，用于开发和布局验证。
-
-**启用功能：**
-- 区域边界绘制
-- 调试信息显示
-- 开发辅助工具
 
 ## 布局工具
 
