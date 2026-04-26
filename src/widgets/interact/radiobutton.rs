@@ -115,7 +115,7 @@ where
 
         let area = self.region.rectangle();
         let changed = *self.radio_value != old_value;
-        let style = ui.style().clone();
+        let style = *ui.style();
         let font = style.default_font;
         let padding = style
             .default_padding
@@ -125,7 +125,7 @@ where
         let mut radio_rect = area.offset(-padding);
         radio_rect.size.width = radio_rect.size.height;
 
-        let border_width = self.border.border_width(&style) as u32;
+        let border_width = self.border.border_width(&style);
         let diameter = radio_rect.size.width;
         let center = radio_rect.center();
 

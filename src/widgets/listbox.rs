@@ -139,7 +139,7 @@ impl<DRAW: DrawTarget<Color = COL>, ID: WidgetId, COL: PixelColor> Widget<DRAW, 
             if index + 1 < self.start_item as usize {
                 continue;
             }
-            let mut text = matrix_utils::make_text(*item, font, color);
+            let mut text = matrix_utils::make_text(item, font, color);
             let character_line_height = text.character_style.line_height;
             let line_height = (character_line_height + self.line_spacing) as i32;
             text.position = Point::new(start_point.x, y_offset);
@@ -150,7 +150,7 @@ impl<DRAW: DrawTarget<Color = COL>, ID: WidgetId, COL: PixelColor> Widget<DRAW, 
                 rect_style.stroke_width = 1;
                 let rect = Rectangle::new(
                     text.position,
-                    Size::new(area.size.width as u32, character_line_height as u32),
+                    Size::new(area.size.width, character_line_height as u32),
                 );
                 ui.draw(&rect.into_styled(rect_style)).ok();
             }

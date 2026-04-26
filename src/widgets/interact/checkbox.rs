@@ -106,7 +106,7 @@ impl<DRAW: DrawTarget<Color = COL>, ID: WidgetId, COL: PixelColor> Widget<DRAW, 
 
         let area = self.region.rectangle();
         let changed = *self.checked != old_checked;
-        let style = ui.style().clone();
+        let style = *ui.style();
         let font = style.default_font;
         let padding = style
             .default_padding

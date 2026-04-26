@@ -155,7 +155,7 @@ impl<C: PixelColor> Drawable for WidgetFramebuf<'_, C> {
 
         #[cfg(feature = "fill-rect")]
         {
-            crate::fill_rect::fill_with_buffer(&area, self.buf.as_ptr() as *const u8);
+            crate::fill_rect::fill_with_buffer(&area, self.buf);
             Ok(())
         }
     }

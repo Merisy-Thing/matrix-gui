@@ -32,7 +32,7 @@ where
 {
     fn draw(&mut self, ui: &mut Ui<DRAW, COL>) -> GuiResult<Response> {
         if !ui.is_modal_active() {
-            ui.clear_area(&self.area.into())?;
+            ui.clear_area(&self.area)?;
         }
 
         // Begin modal context

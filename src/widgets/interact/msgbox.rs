@@ -62,7 +62,7 @@ where
         let mut ok_btn_offset = 0;
         if let Some(ok_region) = self.ok_btn {
             ok_btn_offset = self.region.y() + self.region.height() as i32 - ok_region.y();
-            let mut ok_btn = Button::new(&ok_region, "OK");
+            let mut ok_btn = Button::new(ok_region, "OK");
             let resp = ok_btn.draw(ui)?;
             if resp.is_clicked() {
                 return Ok(Response::Clicked);

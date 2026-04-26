@@ -284,10 +284,10 @@ impl<'a> WidgetStates<'a> {
 
     pub fn should_redraw_multi<ID: WidgetId>(&self, widget_ids: &[ID]) -> bool {
         for widget_id in widget_ids {
-            if let Ok(state) = self.get_state(*widget_id) {
-                if state.compare(RenderStatus::NeedsRedraw) {
-                    return true;
-                }
+            if let Ok(state) = self.get_state(*widget_id)
+                && state.compare(RenderStatus::NeedsRedraw)
+            {
+                return true;
             }
         }
 

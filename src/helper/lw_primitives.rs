@@ -99,7 +99,7 @@ impl LwRectangle<i16, u16> {
     /// # Arguments
     ///
     /// * `percent` - The percentage to scale by (100% means no change).
-    ///               200% means double the size, 50% means half the size, etc.
+    ///   200% means double the size, 50% means half the size, etc.
     pub fn center_scale(&self, horizontal_percent: u16, vertical_percent: u16) -> Self {
         let scale_width_factor = horizontal_percent as i16 - 100;
         let scale_height_factor = vertical_percent as i16 - 100;

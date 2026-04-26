@@ -290,7 +290,7 @@ impl<'a> Focus<'a> {
             && self
                 .widgets_id
                 .get(..self.tracker.size)
-                .map_or(false, |slice| slice.contains(&id))
+                .is_some_and(|slice| slice.contains(&id))
         {
             return true;
         }
@@ -323,6 +323,6 @@ impl<'a> Focus<'a> {
     pub fn is_focused(&self, id: usize) -> bool {
         self.widgets_id
             .get(self.tracker.pos)
-            .map_or(false, |&widget_id| widget_id == id as FocusID)
+            .is_some_and(|&widget_id| widget_id == id as FocusID)
     }
 }

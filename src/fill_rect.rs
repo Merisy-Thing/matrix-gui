@@ -21,20 +21,21 @@ pub fn fill_with_color<COL: PixelColor>(rect: &Rectangle, color: COL) {
         )
     };
 }
-pub fn fill_with_buffer(rect: &Rectangle, colors: *const u8) {
+pub fn fill_with_buffer<C: PixelColor>(rect: &Rectangle, colors: &[C]) {
     unsafe extern "Rust" {
         fn _ll_fill_with_buffer(x: u32, y: u32, w: u32, h: u32, colors: *const u8);
     }
 
     let top_left = rect.top_left;
     let size = rect.size;
+
     unsafe {
         _ll_fill_with_buffer(
             top_left.x as u32,
             top_left.y as u32,
             size.width,
             size.height,
-            colors,
+            colors.as_ptr() as *const u8,
         )
     };
 }

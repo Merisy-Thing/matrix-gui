@@ -251,7 +251,7 @@ impl OptionU8 {
     ///
     /// The set value if present, otherwise `style.corner_radius` as `u32`.
     pub fn corner_radius<COL: PixelColor>(&self, style: &Style<COL>) -> u32 {
-        self.value.unwrap_or(style.corner_radius.into()) as u32
+        self.value.unwrap_or(style.corner_radius) as u32
     }
 
     /// Returns the border width, falling back to the style default if not set.
@@ -268,7 +268,7 @@ impl OptionU8 {
     ///
     /// The set value if present, otherwise `style.border_width` as `u32`.
     pub fn border_width<COL: PixelColor>(&self, style: &Style<COL>) -> u32 {
-        self.value.unwrap_or(style.border_width.into()) as u32
+        self.value.unwrap_or(style.border_width) as u32
     }
 }
 

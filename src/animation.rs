@@ -299,6 +299,12 @@ impl AnimStatus {
     }
 }
 
+impl Default for AnimStatus {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct Animations<const N: usize> {
     animations: [AnimInstance; N],
     anim_status: [AnimStatus; N],
@@ -317,6 +323,12 @@ impl<const N: usize> Animations<N> {
 
     pub fn split(self) -> ([AnimInstance; N], [AnimStatus; N]) {
         (self.animations, self.anim_status)
+    }
+}
+
+impl<const N: usize> Default for Animations<N> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -374,12 +386,12 @@ impl<'a> AnimManager<'a> {
             delay_passed: false,
         };
 
-        if let Some(instance) = self.animations.get_mut(id as usize) {
-            if let Some(status) = self.anim_status.get(id as usize) {
-                status.set(start_value);
-                *instance = anim_instance;
-                return Some(id);
-            }
+        if let Some(instance) = self.animations.get_mut(id as usize)
+            && let Some(status) = self.anim_status.get(id as usize)
+        {
+            status.set(start_value);
+            *instance = anim_instance;
+            return Some(id);
         };
 
         None
@@ -413,15 +425,15 @@ impl<'a> AnimManager<'a> {
     ///
     /// `true` if the animation was found and started.
     pub fn play(&mut self, id: AnimId) -> bool {
-        if let Some(instance) = self.animations.get_mut(id as usize) {
-            if instance.id == id {
-                instance.state = AnimState::Playing;
-                instance.elapsed = Duration::ZERO;
-                instance.current_repeat = 0;
-                instance.is_reversed = instance.anim.options.play_backward;
-                instance.delay_passed = instance.anim.options.start_delay.is_zero();
-                return true;
-            }
+        if let Some(instance) = self.animations.get_mut(id as usize)
+            && instance.id == id
+        {
+            instance.state = AnimState::Playing;
+            instance.elapsed = Duration::ZERO;
+            instance.current_repeat = 0;
+            instance.is_reversed = instance.anim.options.play_backward;
+            instance.delay_passed = instance.anim.options.start_delay.is_zero();
+            return true;
         }
         false
     }
@@ -436,11 +448,12 @@ impl<'a> AnimManager<'a> {
     ///
     /// `true` if the animation was found and paused.
     pub fn pause(&mut self, id: AnimId) -> bool {
-        if let Some(instance) = self.animations.get_mut(id as usize) {
-            if instance.id == id && instance.state == AnimState::Playing {
-                instance.state = AnimState::Paused;
-                return true;
-            }
+        if let Some(instance) = self.animations.get_mut(id as usize)
+            && instance.id == id
+            && instance.state == AnimState::Playing
+        {
+            instance.state = AnimState::Paused;
+            return true;
         }
         false
     }
@@ -455,11 +468,12 @@ impl<'a> AnimManager<'a> {
     ///
     /// `true` if the animation was found and resumed.
     pub fn resume(&mut self, id: AnimId) -> bool {
-        if let Some(instance) = self.animations.get_mut(id as usize) {
-            if instance.id == id && instance.state == AnimState::Paused {
-                instance.state = AnimState::Playing;
-                return true;
-            }
+        if let Some(instance) = self.animations.get_mut(id as usize)
+            && instance.id == id
+            && instance.state == AnimState::Paused
+        {
+            instance.state = AnimState::Playing;
+            return true;
         }
         false
     }
@@ -474,13 +488,13 @@ impl<'a> AnimManager<'a> {
     ///
     /// `true` if the animation was found and stopped.
     pub fn stop(&mut self, id: AnimId) -> bool {
-        if let Some(instance) = self.animations.get_mut(id as usize) {
-            if instance.id == id {
-                instance.state = AnimState::Stopped;
-                instance.elapsed = Duration::ZERO;
-                instance.current_repeat = 0;
-                return true;
-            }
+        if let Some(instance) = self.animations.get_mut(id as usize)
+            && instance.id == id
+        {
+            instance.state = AnimState::Stopped;
+            instance.elapsed = Duration::ZERO;
+            instance.current_repeat = 0;
+            return true;
         }
         false
     }
@@ -495,10 +509,10 @@ impl<'a> AnimManager<'a> {
     ///
     /// The animation state, or `None` if not found.
     pub fn get_state(&self, id: AnimId) -> Option<AnimState> {
-        if let Some(instance) = self.animations.get(id as usize) {
-            if instance.id == id {
-                return Some(instance.state);
-            }
+        if let Some(instance) = self.animations.get(id as usize)
+            && instance.id == id
+        {
+            return Some(instance.state);
         }
         None
     }
