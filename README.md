@@ -97,6 +97,7 @@ This library uses Cargo features to enable optional functionality. By default, n
 ## Layout Tools
 
 The project provides rectangle layout tools for designing your UI layouts. Check the [releases page](https://github.com/Merisy-Thing/matrix-gui/releases) for layout tools and utilities.
+
 ![Layout Tools](assets/layout-tool.png)
 
 ## Examples
