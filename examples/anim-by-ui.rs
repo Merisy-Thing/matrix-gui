@@ -15,11 +15,7 @@ use matrix_gui::style::*;
 //  enum RegionId
 // const REGIONID_COUNT
 // Region (RegionID, x, y, width, height)
-matrix_gui::free_form_region!(
-    RegionId,
-    (BACKGROUND, 0, 0, 0, 0),
-    (ANIM_RECT, 10, 100, 310, 30)
-);
+matrix_gui::free_form_region!(RegionId, (BACKGROUND), (ANIM_RECT, 10, 100, 310, 30));
 
 pub struct BufferedImage<'a, ID> {
     region: &'a Region<ID>,
@@ -125,7 +121,7 @@ fn main() -> Result<(), core::convert::Infallible> {
 
         let mut ui = Ui::new_fullscreen(&mut display, &widget_states, &style);
 
-        ui.add(Background::new(BACKGROUND.id()));
+        ui.add(Background::new(RegionId::Background));
         ui.add(BufferedImage::new(&ANIM_RECT, move_id, color_id));
 
         window.update(&display);

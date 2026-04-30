@@ -4,7 +4,7 @@ use embedded_graphics::primitives::PrimitiveStyleBuilder;
 /// A simple message box with a title, message, and an OK button.
 pub struct MessageBox<'a, ID: WidgetId> {
     region: &'a Region<ID>,
-    ok_btn: Option<&'a Region<ID>>,
+    ok_btn: Option<(&'a Region<ID>, &'a str)>,
     title: &'a str,
     message: &'a str,
 }
@@ -19,8 +19,8 @@ impl<'a, ID: WidgetId> MessageBox<'a, ID> {
         }
     }
 
-    pub const fn with_ok_btn(mut self, ok_btn: &'a Region<ID>) -> Self {
-        self.ok_btn = Some(ok_btn);
+    pub const fn with_ok_btn(mut self, ok_btn: &'a Region<ID>, ok_btn_text: &'a str) -> Self {
+        self.ok_btn = Some((ok_btn, ok_btn_text));
         self
     }
 }
@@ -48,7 +48,7 @@ where
 
 struct MessageBoxContent<'a, ID: WidgetId> {
     region: &'a Region<ID>,
-    ok_btn: Option<&'a Region<ID>>,
+    ok_btn: Option<(&'a Region<ID>, &'a str)>,
     title: &'a str,
     message: &'a str,
 }
@@ -60,9 +60,9 @@ where
 {
     fn draw(&mut self, ui: &mut Ui<DRAW, COL>) -> GuiResult<Response> {
         let mut ok_btn_offset = 0;
-        if let Some(ok_region) = self.ok_btn {
+        if let Some((ok_region, ok_btn_text)) = self.ok_btn {
             ok_btn_offset = self.region.y() + self.region.height() as i32 - ok_region.y();
-            let mut ok_btn = Button::new(ok_region, "OK");
+            let mut ok_btn = Button::new(ok_region, ok_btn_text);
             let resp = ok_btn.draw(ui)?;
             if resp.is_clicked() {
                 return Ok(Response::Clicked);

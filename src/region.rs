@@ -89,6 +89,11 @@ impl<ID: WidgetId> Region<ID> {
         self.id
     }
 
+    /// Returns the area of the region.
+    pub const fn area(&self) -> LwRectangle<i16, u16> {
+        self.area
+    }
+
     /// Replace the widget ID of the region.
     pub const fn replace_id(&self, id: ID) -> Self {
         Self {
@@ -203,11 +208,13 @@ impl<ID: WidgetId> Region<ID> {
 /// - A `RegionID` enum with variants `Button` and `Label`
 /// - A `REGIONID_COUNT` constant set to 2
 /// - Constants `BUTTON` and `LABEL` pointing to the respective regions
+///
+/// Note: If `width` or `height` is 0, the region constant will not be generated.
 #[macro_export]
 macro_rules! free_form_region {
     (
         $enum_name:ident,
-        $(($name:ident, $x:expr, $y:expr, $width:expr, $height:expr)),+
+        $(($name:ident $(, $x:expr, $y:expr, $width:expr, $height:expr)?)),+
         $(,)?
     ) => {
         paste::paste! {
@@ -227,12 +234,25 @@ macro_rules! free_form_region {
             }
         }
 
-        $(paste::paste! {
+        $(
+            matrix_gui::free_form_region_gen_region!(
+                $enum_name, $name, $($x, $y, $width, $height)?
+            );
+        )+
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! free_form_region_gen_region {
+    ($enum_name:ident, $name:ident,) => {};
+    ($enum_name:ident, $name:ident, $x:expr, $y:expr, $width:expr, $height:expr) => {
+        paste::paste! {
             pub const [<$name:upper>]: &$crate::region::Region<[<$enum_name:camel>]> = &$crate::region::Region::new(
                 [<$enum_name:camel>]::[<$name:camel>],
                 $x, $y, $width, $height
             );
-        })+
+        }
     };
 }
 

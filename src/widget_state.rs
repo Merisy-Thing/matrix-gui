@@ -1,7 +1,6 @@
+use crate::ui::{GuiError, GuiResult};
 use core::cell::Cell;
 use enum_iterator::Sequence;
-
-use crate::ui::{GuiError, GuiResult};
 
 pub trait WidgetId: Copy + Sequence + PartialEq + Default {
     fn id(&self) -> usize;
@@ -50,6 +49,10 @@ impl From<u8> for RenderStatus {
     }
 }
 
+const MASK_VALUE: u8 = 0x3F; // 6 bits for value
+const MASK_INTERACTIVE: u8 = 0x80; // 1 bit for interactive
+const MASK_INTERFLAG: u8 = 0x40; // 1 bit for interaction flag
+
 #[derive(Clone, Debug)]
 pub struct RenderState(Cell<u8>);
 
@@ -61,10 +64,11 @@ impl RenderState {
     }
 
     #[inline]
-    const fn interactive(&self) -> u8 {
-        0
+    const fn flags(&self) -> u8 {
+        self.0.get() & !MASK_VALUE
     }
 
+    #[inline]
     pub fn set_status(&self, val: RenderStatus) {
         self.0.set(val as u8);
     }
@@ -72,26 +76,23 @@ impl RenderState {
 
 #[cfg(feature = "interaction")]
 impl RenderState {
-    const MASK_VALUE: u8 = 0x7F; // 7 bits for value
-    const MASK_INTERACTIVE: u8 = 0x80; // 1 bit for interactive
-
     #[inline]
     const fn raw_val(&self) -> u8 {
-        self.0.get() & Self::MASK_VALUE
+        self.0.get() & MASK_VALUE
     }
 
     #[inline]
-    const fn interactive(&self) -> u8 {
-        self.0.get() & Self::MASK_INTERACTIVE
+    const fn flags(&self) -> u8 {
+        self.0.get() & !MASK_VALUE
     }
 
     #[inline]
     pub fn mark_as_interact(&self) {
-        self.0.set(self.0.get() | Self::MASK_INTERACTIVE);
+        self.0.set(self.0.get() | MASK_INTERACTIVE);
     }
 
     pub fn set_status(&self, val: RenderStatus) {
-        self.0.set(self.interactive() | val as u8);
+        self.0.set(self.flags() | val as u8);
     }
 }
 
@@ -114,12 +115,23 @@ impl RenderState {
 
     #[inline]
     pub const fn is_interact(&self) -> bool {
-        self.interactive() != 0
+        (self.flags() & MASK_INTERACTIVE) != 0
     }
 
     #[inline]
     pub const fn is_static(&self) -> bool {
         !self.is_interact()
+    }
+
+    #[inline]
+    pub(crate) fn interflag(&self) -> bool {
+        (self.0.get() & MASK_INTERFLAG) != 0
+    }
+
+    #[inline]
+    pub(crate) fn set_interflag(&self, flag: bool) {
+        let val = if flag { MASK_INTERFLAG } else { 0 };
+        self.0.set(self.0.get() & !MASK_INTERFLAG | val);
     }
 
     pub fn force_redraw(&self) {
@@ -180,6 +192,23 @@ impl<'a> WidgetStates<'a> {
             true
         } else {
             false
+        }
+    }
+
+    pub fn get_internal_flag<ID: WidgetId>(&self, widget_id: ID) -> GuiResult<bool> {
+        if let Some(state) = self.states.get(widget_id.id()) {
+            Ok(state.interflag())
+        } else {
+            Err(GuiError::InvalidWidgetId)
+        }
+    }
+
+    pub fn set_internal_flag<ID: WidgetId>(&self, widget_id: ID, value: bool) -> GuiResult<()> {
+        if let Some(state) = self.states.get(widget_id.id()) {
+            state.set_interflag(value);
+            Ok(())
+        } else {
+            Err(GuiError::InvalidWidgetId)
         }
     }
 

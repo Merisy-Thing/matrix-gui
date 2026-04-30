@@ -39,8 +39,10 @@ part = [
 	"debug-color",
 	"interaction",
 	"framebuffer",
+	"scroll-area",
 ]
 
+scroll-area = ["clipped_draw"]
 debug-color = []
 framebuffer = []
 fill-rect = []
@@ -48,6 +50,7 @@ interaction = []
 focus = ["interaction"]
 animation = []
 popup = []
+clipped_draw = []
 
 [[example]]
 name = "basic-example"

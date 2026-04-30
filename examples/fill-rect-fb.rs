@@ -124,9 +124,9 @@ fn main() -> Result<(), core::convert::Infallible> {
     let output_settings = OutputSettingsBuilder::new().scale(1).build();
     let mut window = Window::new("Hello World", &output_settings);
     // input handling variables
-    let mut mouse_down = false;
-    let mut last_down = false;
-    let mut location = Point::new(0, 0);
+    // let mut mouse_down = false;
+    // let mut last_down = false;
+    // let mut location = Point::new(0, 0);
     let smartstates = RenderState::new_array::<REGIONID_COUNT>();
     let widget_states = WidgetStates::new(&smartstates);
 
@@ -145,20 +145,20 @@ fn main() -> Result<(), core::convert::Infallible> {
         //ui.draw_widget_bounds_debug(rgb565!(0x7F7F00));
 
         // handle input
-        match (last_down, mouse_down, location) {
-            (false, true, loc) => {
-                ui.interact(Interaction::Pressed(loc));
-            }
-            (true, true, loc) => {
-                ui.interact(Interaction::Drag(loc));
-            }
-            (true, false, loc) => {
-                ui.interact(Interaction::Release(loc));
-            }
-            (false, false, _) => {}
-        }
+        // match (last_down, mouse_down, location) {
+        //     (false, true, loc) => {
+        //         ui.interact(Interaction::Pressed(loc));
+        //     }
+        //     (true, true, loc) => {
+        //         ui.interact(Interaction::Drag(loc));
+        //     }
+        //     (true, false, loc) => {
+        //         ui.interact(Interaction::Release(loc));
+        //     }
+        //     (false, false, _) => {}
+        // }
 
-        last_down = mouse_down;
+        // last_down = mouse_down;
         // =================================
 
         let mut framebuf = [Rgb565::BLACK; 256 * 257];
@@ -193,23 +193,24 @@ fn main() -> Result<(), core::convert::Infallible> {
                         widget_states.force_redraw_all();
                     }
                 }
-                SimulatorEvent::MouseButtonUp { mouse_btn, point } => {
-                    if let MouseButton::Left = mouse_btn {
-                        mouse_down = false;
-                    }
-                    location = point;
-                }
-                SimulatorEvent::MouseButtonDown { mouse_btn, point } => {
-                    if let MouseButton::Left = mouse_btn {
-                        mouse_down = true;
-                    }
-                    location = point;
-                }
-                SimulatorEvent::MouseWheel { .. } => {}
-                SimulatorEvent::MouseMove { point } => {
-                    location = point;
-                }
+                // SimulatorEvent::MouseButtonUp { mouse_btn, point } => {
+                //     if let MouseButton::Left = mouse_btn {
+                //         mouse_down = false;
+                //     }
+                //     location = point;
+                // }
+                // SimulatorEvent::MouseButtonDown { mouse_btn, point } => {
+                //     if let MouseButton::Left = mouse_btn {
+                //         mouse_down = true;
+                //     }
+                //     location = point;
+                // }
+                // SimulatorEvent::MouseWheel { .. } => {}
+                // SimulatorEvent::MouseMove { point } => {
+                //     location = point;
+                // }
                 SimulatorEvent::Quit => break 'outer,
+                _ => {}
             }
         }
     }

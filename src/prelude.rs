@@ -39,7 +39,10 @@ pub use crate::region::{self, Region};
 pub use crate::modal::Modal;
 
 #[cfg(all(feature = "interaction", feature = "popup"))]
-pub use crate::widgets::interact::msgbox::MessageBox;
+pub use crate::widgets::interact::{choice::Choice, msgbox::MessageBox};
+
+#[cfg(feature = "scroll-area")]
+pub use crate::widgets::scrollarea::{ScrollArea, ScrollDirection, ScrollState};
 
 // Built-in widgets
 pub use crate::widgets::{

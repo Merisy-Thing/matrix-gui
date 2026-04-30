@@ -1,0 +1,160 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Cargo build",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"build",
+				"--features",
+				"all"
+			],
+			"problemMatcher": {
+				"base": "$rustc",
+				"fileLocation": "absolute"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Cargo clean",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"clean"
+			]
+		},
+		{
+			"label": "[ Check Examples ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"check",
+				"--examples",
+				"--features",
+				"part"
+			]
+		},
+		{
+			"label": "[ Test Doc ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"test",
+				"--doc",
+				"--all-features"
+			]
+		},
+		{
+			"label": "[ Run anim ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"run",
+				"--features",
+				"anim",
+				"--example",
+				"${input:anim}"
+			]
+		},
+		{
+			"label": "[ Run popup ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"run",
+				"--features",
+				"popup,part",
+				"--example",
+				"${input:popup}"
+			]
+		},
+		{
+			"label": "[ Run fill-rect ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"run",
+				"--features",
+				"log,fill-rect,framebuffer",
+				"--example",
+				"${input:fill-rect}"
+			]
+		},
+		{
+			"label": "[ Run basic ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"run",
+				"--example",
+				"${input:basic}"
+			]
+		},
+		{
+			"label": "[ Run part ]",
+			"type": "shell",
+			"command": "cargo",
+			"args": [
+				"run",
+				"--features",
+				"part",
+				"--example",
+				"${input:part}"
+			]
+		}
+	],
+	"inputs": [
+		{
+			"id": "part",
+			"type": "pickString",
+			"description": "What example do you want to run?",
+			"options": [
+				"basic-example",
+				"list-box",
+				"scroll-area",
+				"grid-layout",
+				"const-grid-layout",
+			],
+		},
+		{
+			"id": "basic",
+			"type": "pickString",
+			"description": "What example do you want to run?",
+			"options": [
+				"plain-text",
+			],
+		},
+		{
+			"id": "fill-rect",
+			"type": "pickString",
+			"description": "What example do you want to run?",
+			"options": [
+				"fill-rect-fb"
+			],
+		},
+		{
+			"id": "popup",
+			"type": "pickString",
+			"description": "What example do you want to run?",
+			"options": [
+				"msg-box",
+				"choice-demo",
+			],
+		},
+		{
+			"id": "anim",
+			"type": "pickString",
+			"description": "What example do you want to run?",
+			"options": [
+				"anim-demo",
+				"anim-by-ui",
+			],
+		}
+	]
+}

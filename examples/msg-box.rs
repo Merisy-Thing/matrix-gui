@@ -100,7 +100,7 @@ fn main() -> Result<(), core::convert::Infallible> {
             // NOTE: popup widget place at last position
             let response = ui.add(
                 MessageBox::new(MSG_BOX, "This is title", "Hello World\nHello Matrix GUI!")
-                    .with_ok_btn(MSG_BOX_OK),
+                    .with_ok_btn(MSG_BOX_OK, "OoooK"),
             );
             if response.is_clicked() {
                 log::info!("OK msg clicked");

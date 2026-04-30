@@ -39,10 +39,15 @@ use core::fmt::Debug;
 use embedded_graphics::draw_target::DrawTarget;
 use embedded_graphics::geometry::Dimensions;
 use embedded_graphics::pixelcolor::PixelColor;
+#[cfg(feature = "clipped_draw")]
+use embedded_graphics::prelude::DrawTargetExt;
 #[cfg(feature = "interaction")]
 use embedded_graphics::prelude::Point;
 use embedded_graphics::primitives::Rectangle;
 use embedded_graphics::{Drawable, Pixel};
+
+#[cfg(feature = "debug-color")]
+static DBG_CNT: core::sync::atomic::AtomicU32 = core::sync::atomic::AtomicU32::new(0);
 
 /// Error types that can occur during GUI operations.
 ///
@@ -398,8 +403,13 @@ impl Default for Align {
 struct Painter<'a, COL: PixelColor, DRAW: DrawTarget<Color = COL>> {
     /// The underlying draw target.
     target: &'a mut DRAW,
+
+    /// The area to draw in, if clipping is enabled.
+    #[cfg(feature = "clipped_draw")]
+    clipped_area: Option<Rectangle>,
 }
 
+#[cfg(not(feature = "clipped_draw"))]
 impl<'a, COL: PixelColor, DRAW: DrawTarget<Color = COL>> Painter<'a, COL, DRAW> {
     /// Creates a new painter wrapping the given draw target.
     ///
@@ -426,6 +436,54 @@ impl<'a, COL: PixelColor, DRAW: DrawTarget<Color = COL>> Painter<'a, COL, DRAW> 
     fn draw(&mut self, item: &impl Drawable<Color = COL>) -> GuiResult<()> {
         item.draw(self.target).map_err(|_| GuiError::DrawError)?;
         Ok(())
+    }
+}
+
+#[cfg(feature = "clipped_draw")]
+impl<'a, COL: PixelColor, DRAW: DrawTarget<Color = COL>> Painter<'a, COL, DRAW> {
+    /// Creates a new painter wrapping the given draw target.
+    ///
+    /// # Arguments
+    ///
+    /// * `target` - Mutable reference to the draw target to wrap.
+    ///
+    /// # Returns
+    ///
+    /// A new `Painter` instance.
+    fn new(target: &'a mut DRAW) -> Self {
+        Self {
+            target,
+            clipped_area: None,
+        }
+    }
+
+    /// Draws a drawable item to the target.
+    ///
+    /// # Arguments
+    ///
+    /// * `item` - Reference to an item implementing `Drawable`.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` if drawing succeeds, `Err(GuiError::DrawError)` otherwise.
+    fn draw(&mut self, item: &impl Drawable<Color = COL>) -> GuiResult<()> {
+        if let Some(area) = &self.clipped_area {
+            let mut clipped = self.target.clipped(area);
+            item.draw(&mut clipped).map_err(|_| GuiError::DrawError)?;
+        } else {
+            item.draw(self.target).map_err(|_| GuiError::DrawError)?;
+        }
+        Ok(())
+    }
+
+    /// Sets the area to draw in, if clipping is enabled.
+    ///
+    /// # Arguments
+    ///
+    /// * `area` - The area to draw in.
+    ///
+    fn set_clipped_area(&mut self, area: Option<Rectangle>) {
+        self.clipped_area = area;
     }
 }
 
@@ -718,6 +776,16 @@ where
             Interaction::None
         }
     }
+
+    /// Sets the area to draw in, if clipping is enabled.
+    ///
+    /// # Arguments
+    ///
+    /// * `area` - The area to draw in.
+    #[cfg(feature = "clipped_draw")]
+    pub fn set_clipped_area(&mut self, area: Option<Rectangle>) {
+        self.painter.set_clipped_area(area);
+    }
 }
 
 impl<COL, DRAW> Ui<'_, DRAW, COL>
@@ -778,10 +846,8 @@ where
     pub fn clear_area_raw(&mut self, area: &Rectangle, color: COL) -> GuiResult<()> {
         #[cfg(not(feature = "fill-rect"))]
         {
-            use embedded_graphics::primitives::{PrimitiveStyle, StyledDrawable};
-
-            area.draw_styled(&PrimitiveStyle::with_fill(color), self.painter.target)
-                .map_err(|_| GuiError::DrawError)
+            use embedded_graphics::{prelude::Primitive, primitives::PrimitiveStyle};
+            self.draw(&area.into_styled(PrimitiveStyle::with_fill(color)))
         }
         #[cfg(feature = "fill-rect")]
         {
@@ -822,6 +888,11 @@ where
     ///
     /// `Ok(())` if drawing succeeds, `Err(GuiError::DrawError)` otherwise.
     pub fn draw(&mut self, item: &impl Drawable<Color = COL>) -> GuiResult<()> {
+        #[cfg(feature = "debug-color")]
+        {
+            self.update_debug_counter();
+        }
+
         self.painter.draw(item)
     }
 }
@@ -851,6 +922,51 @@ where
     /// `Err(GuiError::InvalidWidgetId)` otherwise.
     pub fn get_widget_state<ID: WidgetId>(&self, widget_id: ID) -> GuiResult<&RenderState> {
         self.widget_states.get_state(widget_id)
+    }
+
+    /// Retrieves the internal flag for a widget.
+    ///
+    /// This method returns the internal flag for the widget with the specified ID.
+    /// The internal flag is a boolean value that is used to track the state of the widget.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `ID` - The widget ID type implementing [`WidgetId`]
+    ///
+    /// # Arguments
+    ///
+    /// * `widget_id` - The identifier of the widget.
+    ///
+    /// # Returns
+    ///
+    /// The internal flag as a `bool` value.
+    pub fn get_widget_internal_flag<ID: WidgetId>(&self, widget_id: ID) -> GuiResult<bool> {
+        self.widget_states.get_internal_flag(widget_id)
+    }
+
+    /// Sets the internal flag for a widget.
+    ///
+    /// This method sets the internal flag for the widget with the specified ID.
+    /// The internal flag is a boolean value that is used to track the state of the widget.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `ID` - The widget ID type implementing [`WidgetId`]
+    ///
+    /// # Arguments
+    ///
+    /// * `widget_id` - The identifier of the widget.
+    /// * `value` - The new value for the internal flag.
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` if setting the internal flag succeeds, `Err(GuiError)` otherwise.
+    pub fn set_widget_internal_flag<ID: WidgetId>(
+        &self,
+        widget_id: ID,
+        value: bool,
+    ) -> GuiResult<()> {
+        self.widget_states.set_internal_flag(widget_id, value)
     }
 
     /// Retrieves the animation status for a widget.
@@ -1071,5 +1187,18 @@ where
             )
             .ok();
         }
+    }
+
+    /// Returns the current debug counter value.
+    ///
+    /// This method is useful for debugging and tracking the number of draw calls
+    /// made by the UI context.
+    pub fn get_debug_counter(&self) -> u32 {
+        DBG_CNT.load(core::sync::atomic::Ordering::Relaxed)
+    }
+
+    /// Updates the debug counter.
+    fn update_debug_counter(&mut self) {
+        DBG_CNT.fetch_add(1, core::sync::atomic::Ordering::Relaxed);
     }
 }
