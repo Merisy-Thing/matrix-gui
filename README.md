@@ -35,6 +35,8 @@ An immediate-mode embedded GUI framework inspired by [kolibri-embedded-gui](http
 - `Checkbox` - Checkboxes
 - `RadioButton` - Radio buttons
 - `Slider` - Sliders
+- `ScrollArea` - Scrollable areas with drag interaction
+- `Choice` - Popup selector (requires `popup` feature)
 - `MessageBox` - Message dialogs (requires `popup` feature)
 
 ## Screenshots
@@ -109,6 +111,8 @@ The project provides rectangle layout tools for designing your UI layouts. Check
 - [list-box](examples/list-box.rs) - List box widget example
 - [msg-box](examples/msg-box.rs) - Message box example
 - [plain-text](examples/plain-text.rs) - Plain text widget
+- [choice-demo](examples/choice-demo.rs) - Dropdown choice selector with modal popup
+- [scrollarea](examples/scrollarea.rs) - Scrollable area with drag, wheel and keyboard scrolling
 - [grid-layout](examples/grid-layout.rs) - Grid layout example
 - [const-grid-layout](examples/const-grid-layout.rs) - Compile-time grid layout
 
@@ -118,6 +122,8 @@ Run examples with:
 cargo run --features part --example basic-example
 cargo run --features anim --example anim-by-ui
 cargo run --features popup,part --example msg-box
+cargo run --features popup,part --example choice-demo
+cargo run --features part --example scrollarea
 ```
 
 ## [Documents](https://docs.rs/matrix-gui/latest/matrix_gui/#modules)

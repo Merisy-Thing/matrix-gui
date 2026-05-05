@@ -35,6 +35,8 @@
 - `Checkbox` - 复选框
 - `RadioButton` - 单选按钮
 - `Slider` - 滑块
+- `ScrollArea` - 可拖拽滑动的滚动区域
+- `Choice` - 弹出选择菜单（需要 `popup` 功能）
 - `MessageBox` - 消息对话框（需要 `popup` 功能）
 
 ## 截图展示
@@ -107,6 +109,8 @@ matrix-gui = "0.1.0"
 - [list-box](examples/list-box.rs) - 列表框widget示例
 - [msg-box](examples/msg-box.rs) - 消息框示例
 - [plain-text](examples/plain-text.rs) - 纯文本widget
+- [choice-demo](examples/choice-demo.rs) - 下拉选择器示例，弹出模态菜单
+- [scrollarea](examples/scrollarea.rs) - 可滚动区域示例，支持拖拽、滚轮和键盘滚动
 - [grid-layout](examples/grid-layout.rs) - 网格布局示例
 - [const-grid-layout](examples/const-grid-layout.rs) - 编译时网格布局
 
@@ -116,6 +120,8 @@ matrix-gui = "0.1.0"
 cargo run --features part --example basic-example
 cargo run --features anim --example anim-by-ui
 cargo run --features popup,part --example msg-box
+cargo run --features popup,part --example choice-demo
+cargo run --features part --example scrollarea
 ```
 
 ## 许可证

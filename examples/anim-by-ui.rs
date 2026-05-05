@@ -108,7 +108,7 @@ fn main() -> Result<(), core::convert::Infallible> {
 
     let mut last_time = std::time::Instant::now();
     let smartstates = RenderState::new_array::<REGIONID_COUNT>();
-    let widget_states = WidgetStates::new(&smartstates, &anim_status);
+    let widget_states = WidgetStates::new_with_anim(&smartstates, &anim_status);
 
     let style = rgb565_light_style();
 

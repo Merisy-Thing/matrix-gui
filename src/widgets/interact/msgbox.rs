@@ -1,7 +1,23 @@
+//! Message box widget for displaying modal dialogs.
+//!
+//! This module provides a message box widget that displays a modal dialog
+//! with a title, message text, and an optional OK button. It uses the
+//! [`Modal`] system to dim the background and block interaction with
+//! other widgets while the message box is open.
+
 use crate::prelude::*;
 use embedded_graphics::primitives::PrimitiveStyleBuilder;
 
-/// A simple message box with a title, message, and an OK button.
+/// A modal message box with a title, message, and an optional OK button.
+///
+/// This widget wraps its content in a [`Modal`], dimming the background and
+/// blocking interaction with other widgets. When the OK button (if configured)
+/// is clicked, the message box returns [`Response::Clicked`].
+///
+/// # Type Parameters
+///
+/// * `'a` - The lifetime of the string and region references
+/// * `ID` - The widget ID type implementing [`WidgetId`]
 pub struct MessageBox<'a, ID: WidgetId> {
     region: &'a Region<ID>,
     ok_btn: Option<(&'a Region<ID>, &'a str)>,
@@ -46,6 +62,7 @@ where
     }
 }
 
+/// Internal content widget rendered inside a [`Modal`] by [`MessageBox`].
 struct MessageBoxContent<'a, ID: WidgetId> {
     region: &'a Region<ID>,
     ok_btn: Option<(&'a Region<ID>, &'a str)>,

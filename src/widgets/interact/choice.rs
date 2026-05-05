@@ -1,15 +1,22 @@
+//! Dropdown choice widget for selecting from a list of options.
+//!
+//! This module provides a [`Choice`] widget that displays as a button showing
+//! the currently selected option. When pressed, it opens a modal popup
+//! containing a vertical list of buttons representing each selectable option.
+
 use crate::prelude::*;
 
-/// A choice control that displays as a button and shows a modal with options when pressed.
+/// A dropdown choice control that opens a modal popup with selectable options.
 ///
-/// This widget displays as a button showing the currently selected option (or default text).
-/// When pressed, it opens a modal dialog containing a vertical list of buttons representing
-/// each option. The first button's region is provided, and subsequent buttons are positioned
-/// vertically below it based on the button height and padding from the style.
+/// This widget displays as a button showing the currently selected option
+/// (or a default label). When pressed, it opens a modal dialog containing a
+/// vertical list of buttons — one for each option. Selecting an option closes
+/// the popup and returns the chosen index via [`Response::User`].
 ///
 /// # Type Parameters
 ///
-/// * `'a` - The lifetime of the options array and region reference
+/// * `'a` - The lifetime of the options array and region references
+/// * `'b` - The lifetime of the option label strings
 /// * `ID` - The widget ID type implementing [`WidgetId`]
 pub struct Choice<'a, 'b, ID: WidgetId> {
     region: &'a Region<ID>,

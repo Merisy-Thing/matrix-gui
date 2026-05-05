@@ -311,7 +311,6 @@ pub struct Animations<const N: usize> {
 }
 
 impl<const N: usize> Animations<N> {
-    /// Creates a new animation manager.
     pub fn new() -> Self {
         let animations = core::array::from_fn(|_| AnimInstance::new());
         let anim_status = core::array::from_fn(|_| AnimStatus::new());
@@ -323,6 +322,10 @@ impl<const N: usize> Animations<N> {
 
     pub fn split(self) -> ([AnimInstance; N], [AnimStatus; N]) {
         (self.animations, self.anim_status)
+    }
+
+    pub fn as_mut(&mut self) -> (&mut [AnimInstance; N], &[AnimStatus; N]) {
+        (&mut self.animations, &self.anim_status)
     }
 }
 
@@ -375,7 +378,6 @@ impl<'a> AnimManager<'a> {
         let id = self.next_id;
         self.next_id = self.next_id.wrapping_add(1);
 
-        let start_value = anim.start_value;
         let anim_instance = AnimInstance {
             id,
             state: AnimState::Stopped,
@@ -386,10 +388,7 @@ impl<'a> AnimManager<'a> {
             delay_passed: false,
         };
 
-        if let Some(instance) = self.animations.get_mut(id as usize)
-            && let Some(status) = self.anim_status.get(id as usize)
-        {
-            status.set(start_value);
+        if let Some(instance) = self.animations.get_mut(id as usize) {
             *instance = anim_instance;
             return Some(id);
         };
@@ -433,6 +432,10 @@ impl<'a> AnimManager<'a> {
             instance.current_repeat = 0;
             instance.is_reversed = instance.anim.options.play_backward;
             instance.delay_passed = instance.anim.options.start_delay.is_zero();
+
+            if let Some(status) = self.anim_status.get(id as usize) {
+                status.set(instance.anim.start_value);
+            }
             return true;
         }
         false
@@ -525,7 +528,7 @@ impl<'a> AnimManager<'a> {
     /// # Arguments
     ///
     /// * `elapsed` - Time elapsed since the last update
-    pub fn tick(&mut self, elapsed: Duration) {
+    pub fn tick(&mut self, elapsed: Duration) -> bool {
         for (idx, instance) in self.animations.iter_mut().enumerate() {
             if idx >= self.next_id as usize {
                 break;
@@ -597,7 +600,11 @@ impl<'a> AnimManager<'a> {
                     instance.state = AnimState::Stopped;
                 }
             }
+
+            return true;
         }
+
+        false
     }
 
     /// Returns the number of active animations.

@@ -1,9 +1,27 @@
+//! Off-screen framebuffer for efficient widget rendering.
+//!
+//! This module provides a [`WidgetFramebuf`] draw target that renders widgets
+//! into an off-screen buffer. The buffer can then be drawn to the display
+//! as a single draw operation, which is useful for optimizing complex widget
+//! rendering or enabling double-buffering techniques in embedded environments.
+
 use core::convert::Infallible;
 use core::ops::Sub;
 use embedded_graphics::Pixel;
 use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::Rectangle;
 
+/// An off-screen framebuffer that implements both [`DrawTarget`] and [`Drawable`].
+///
+/// This widget provides a memory buffer that acts as a [`DrawTarget`], allowing
+/// widgets to render into it. The buffer contents can then be drawn to a
+/// display as a single [`Drawable`] item, reducing per-pixel draw overhead.
+/// It supports pixel iteration, contiguous fill, solid fill, and clear operations.
+///
+/// # Type Parameters
+///
+/// * `'a` — The lifetime of the borrowed buffer
+/// * `C` — The pixel color type implementing [`PixelColor`]
 pub struct WidgetFramebuf<'a, C: PixelColor> {
     buf: &'a mut [C],
     size: Size,

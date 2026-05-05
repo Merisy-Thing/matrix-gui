@@ -1,7 +1,16 @@
+//! Scrollable area widget for displaying content that exceeds the viewport.
+//!
+//! This module provides a [`ScrollArea`] widget that renders a scrollable region
+//! with support for drag-to-scroll interaction. The scrollable content is
+//! provided as a fixed-size array of [`Region`]s, whose positions are offset
+//! based on the current scroll state. Content that falls outside the viewport
+//! is automatically clipped.
+
 use embedded_graphics::{draw_target::DrawTarget, prelude::PixelColor};
 
 use crate::prelude::*;
 
+/// The direction(s) in which a [`ScrollArea`] allows scrolling.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScrollDirection {
     Vertical,
@@ -9,6 +18,18 @@ pub enum ScrollDirection {
     Both,
 }
 
+/// Tracks the scroll offset and drag state for a [`ScrollArea`].
+///
+/// This struct maintains both the current scroll position (`x`, `y`) and
+/// internal state for tracking the last rendered position and ongoing
+/// drag interactions. It implements smart redraw: rendering is skipped
+/// when neither the scroll offset nor the widget interaction state has
+/// changed since the last frame.
+///
+/// # Fields
+///
+/// * `x` — Current horizontal scroll offset in pixels
+/// * `y` — Current vertical scroll offset in pixels
 #[derive(Clone, Debug)]
 pub struct ScrollState {
     pub x: i16,
@@ -46,6 +67,20 @@ impl Default for ScrollState {
     }
 }
 
+/// A scrollable viewport that offsets and clips child widget regions.
+///
+/// `ScrollArea` takes a fixed-size array of inner [`Region`]s, offsets them
+/// according to a [`ScrollState`], and clips any that fall outside the viewport.
+/// The `show` method handles interaction internally via drag-to-scroll, and
+/// passes the adjusted region slice to an `add_contents` closure for rendering.
+///
+/// # Type Parameters
+///
+/// * `'a` — The lifetime of the region and scroll state references
+/// * `ID` — The widget ID type for the viewport region, implementing [`WidgetId`]
+/// * `IID` — The widget ID type for the inner content regions, implementing [`WidgetId`]
+/// * `COL` — The pixel color type implementing [`PixelColor`]
+/// * `N` — The number of inner regions (compile-time constant)
 pub struct ScrollArea<'a, ID, IID, COL, const N: usize> {
     region: &'a Region<ID>,
     inner_regions: &'a [Region<IID>; N],

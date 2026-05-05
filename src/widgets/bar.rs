@@ -107,8 +107,6 @@ impl<DRAW: DrawTarget<Color = COL>, ID: WidgetId, COL: PixelColor> Widget<DRAW, 
             / (self.filled_value + self.unfilled_value) as u32;
         let unfilled_len = indic_width - filled_len;
 
-        ui.clear_area(&area)?;
-
         if filled_len > 0 {
             let filled_size = Size::new(filled_len, indic_height);
             let filled_style = PrimitiveStyle::with_fill(self.color_filled.text_color(ui.style()));

@@ -167,10 +167,11 @@ pub struct WidgetStates<'a> {
 }
 
 impl<'a> WidgetStates<'a> {
-    #[cfg(not(feature = "animation"))]
     pub const fn new(states: &'a [RenderState]) -> Self {
         WidgetStates {
             states,
+            #[cfg(feature = "animation")]
+            anim_status: &[],
             #[cfg(feature = "popup")]
             modal_active: Cell::new(false),
         }
@@ -270,7 +271,7 @@ impl<'a> WidgetStates<'a> {
 
 #[cfg(feature = "animation")]
 impl<'a> WidgetStates<'a> {
-    pub const fn new(
+    pub const fn new_with_anim(
         states: &'a [RenderState],
         anim_status: &'a [crate::prelude::AnimStatus],
     ) -> Self {
