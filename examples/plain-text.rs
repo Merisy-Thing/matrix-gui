@@ -10,7 +10,7 @@ use embedded_graphics_simulator::{
 use matrix_gui::prelude::*;
 use matrix_gui::style::*;
 use matrix_gui::widgets::plaintext::PlainText;
-use multi_mono_font::{CharSize, MultiMonoFont, mapping::StrGlyphMapping};
+use multi_mono_font::{CharSize, GlyphData, MultiMonoFont, mapping::StrGlyphMapping};
 
 // --------------------
 // 字体: 宋体, 12
@@ -21,7 +21,10 @@ use multi_mono_font::{CharSize, MultiMonoFont, mapping::StrGlyphMapping};
 // 显示: 单色 阈值：64
 // --------------------
 const GB2313_TIER1_16X16_FONT: MultiMonoFont = MultiMonoFont {
-    image: ImageRaw::new(include_bytes!("../assets/GB2313_Tier1_16x16_11.bin"), 3600),
+    glyph_data: GlyphData::ImgRaw(ImageRaw::new(
+        include_bytes!("../assets/GB2313_Tier1_16x16_11.bin"),
+        3600,
+    )),
     glyph_mapping: &StrGlyphMapping::new(include_str!("../assets/GB2313_Tier1.txt"), 0),
     character_size: CharSize::new(16, 16),
     character_spacing: 0,

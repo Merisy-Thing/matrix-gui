@@ -241,7 +241,7 @@ checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
 name = "matrix-gui"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "embedded-graphics",
  "embedded-graphics-simulator",
@@ -284,12 +284,12 @@ dependencies = [
 
 [[package]]
 name = "multi-mono-font"
-version = "0.4.4"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e85352f454b31350eb0845bd131b812d7b190d6918ba14961197544b28ec0267"
+checksum = "5e98a86bc0ab775eadf849ee0230a608ca9e4e91ac402d8b4adf5f33a6097066"
 dependencies = [
+ "cfg-if",
  "embedded-graphics",
- "log",
 ]
 
 [[package]]

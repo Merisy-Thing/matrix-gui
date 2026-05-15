@@ -1,6 +1,6 @@
 [package]
 name = "matrix-gui"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 license = "MIT"
 authors = ["Merisy-Thing <merisy-thing@outlook.com>"]
@@ -14,7 +14,7 @@ repository = "https://github.com/Merisy-Thing/matrix-gui"
 
 [dependencies]
 embedded-graphics = "^0.8"
-multi-mono-font = { version = "0.4" }
+multi-mono-font = { version = "0.5" }
 enum-iterator = "2.3"
 log = { version = "0.4", optional = true }
 paste = "1.0"

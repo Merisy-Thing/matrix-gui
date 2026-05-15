@@ -529,6 +529,8 @@ impl<'a> AnimManager<'a> {
     ///
     /// * `elapsed` - Time elapsed since the last update
     pub fn tick(&mut self, elapsed: Duration) -> bool {
+        let mut updated = false;
+
         for (idx, instance) in self.animations.iter_mut().enumerate() {
             if idx >= self.next_id as usize {
                 break;
@@ -600,11 +602,10 @@ impl<'a> AnimManager<'a> {
                     instance.state = AnimState::Stopped;
                 }
             }
-
-            return true;
+            updated = true;
         }
 
-        false
+        updated
     }
 
     /// Returns the number of active animations.
