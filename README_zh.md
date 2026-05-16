@@ -73,7 +73,7 @@
 
 ```toml
 [dependencies]
-matrix-gui = "0.1.0"
+matrix-gui = "*"
 ```
 
 ## 功能特性
