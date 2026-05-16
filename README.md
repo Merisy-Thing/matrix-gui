@@ -73,7 +73,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-matrix-gui = "0.1.0"
+matrix-gui = "0.3.0"
 ```
 
 ## Features
