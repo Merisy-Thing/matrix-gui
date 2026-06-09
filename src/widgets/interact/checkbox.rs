@@ -93,10 +93,13 @@ impl<DRAW: DrawTarget<Color = COL>, ID: WidgetId, COL: PixelColor> Widget<DRAW, 
             Interaction::Pressed(_) | Interaction::Drag(_) => {
                 next_state = RenderStatus::Pressed;
             }
-            Interaction::Release(pos) | Interaction::Clicked(pos) => {
+            Interaction::Release(_pos) | Interaction::Clicked(_pos) => {
                 *self.checked = !*self.checked;
                 next_state = RenderStatus::Released;
-                interaction = Interaction::Clicked(pos);
+                #[cfg(feature = "focus")]
+                {
+                    interaction = Interaction::Clicked(_pos);
+                }
             }
         }
         if next_state == prev_state {

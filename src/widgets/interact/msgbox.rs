@@ -92,15 +92,26 @@ where
         }
         let style = ui.style();
 
-        let title_region =
-            self.region
-                .resized(self.region.width() as u16, 32, AnchorPoint::TopLeft);
+        let title_font = style
+            .default_font
+            .first()
+            .unwrap_or(&crate::ui_font::DEFAULT_FONT_ASCII[0]);
+        let title_height =
+            title_font.character_size.height as u16 + style.default_padding.height as u16 * 2;
+        let title_region = self.region.resized(
+            self.region.width() as u16,
+            title_height,
+            AnchorPoint::TopLeft,
+        );
 
         let padding_w = ui.style().default_padding.width as i16;
         let msg_region = self
             .region
             .delta_resize(DeltaResize::TopLeft(0, -(ok_btn_offset as i16)))
-            .delta_resize(DeltaResize::BottomLeft(-(padding_w * 2), -32))
+            .delta_resize(DeltaResize::BottomLeft(
+                -(padding_w * 2),
+                -(title_height as i16),
+            ))
             .move_by(padding_w, 0);
 
         let border_style = PrimitiveStyleBuilder::new()
