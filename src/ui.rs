@@ -686,6 +686,32 @@ where
         widget.draw(self).unwrap_or_else(Response::from_error)
     }
 
+    /// Adds multiple widgets to the UI and draws them.
+    ///
+    /// This method iterates over the widgets in the provided iterator and calls
+    /// [`add`] for each one.
+    ///
+    /// # Arguments
+    ///
+    /// * `widgets` - An iterator that yields widgets to add and draw.
+    ///
+    /// # Returns
+    ///
+    /// If any widget returns a non-`Response::Idle`, the method returns that response.
+    /// If all widgets return `Response::Idle`, the method returns `Response::Idle`.
+    pub fn add_widgets(
+        &mut self,
+        widgets: impl IntoIterator<Item = impl Widget<DRAW, COL>>,
+    ) -> Response {
+        for widget in widgets {
+            let response = self.add(widget);
+            if response != Response::Idle {
+                return response;
+            }
+        }
+        Response::Idle
+    }
+
     /// Conditionally draws a widget based on its redraw state.
     ///
     /// This method only calls the drawing closure if the widget needs to be

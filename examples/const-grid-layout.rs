@@ -105,6 +105,14 @@ matrix_gui::grid_layout_row_major_with_start!(
     ]
 );
 
+const COL_BTN_LIST: [Button<GridLayoutColMajor>; GRIDLAYOUT_COL_MAJOR_COUNT] = [
+    Button::new(COLID0, "Column 0"),
+    Button::new(COLID1, "Column 1"),
+    Button::new(COLID2, "Column 2"),
+    Button::new(COLID3, "Column 3"),
+    Button::new(COLID4, "Column 4"),
+];
+
 fn main() -> Result<(), core::convert::Infallible> {
     let screen_size = Size::new(640, 540);
     let mut display = SimulatorDisplay::<Rgb565>::new(screen_size);
@@ -160,11 +168,8 @@ fn main() -> Result<(), core::convert::Infallible> {
         }
 
         widget_states.force_redraw_all();
-        ui.add(Button::new(COLID0, "Column 0"));
-        ui.add(Button::new(COLID1, "Column 1"));
-        ui.add(Button::new(COLID2, "Column 2"));
-        ui.add(Button::new(COLID3, "Column 3"));
-        ui.add(Button::new(COLID4, "Column 4"));
+
+        ui.add_widgets(COL_BTN_LIST);
 
         ui.add(Button::new(COLWITHSTARTID0, "Col0 WS"));
         ui.add(Button::new(COLWITHSTARTID1, "Col1 WS"));
