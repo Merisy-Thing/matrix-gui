@@ -183,16 +183,7 @@ impl<const N: usize> FocusState<N> {
     /// `true` if focus was moved, `false` if no widgets are registered.
     #[allow(clippy::should_implement_trait)]
     pub fn focus_next(&mut self) -> bool {
-        self.tracker.trigger = None;
-        if self.tracker.pos < self.tracker.size {
-            self.tracker.pos += 1;
-            if self.tracker.pos >= self.tracker.size {
-                self.tracker.pos = 0;
-            }
-            true
-        } else {
-            false
-        }
+        self.focus_next_by(1)
     }
 
     /// Moves focus to the previous widget.
@@ -205,17 +196,89 @@ impl<const N: usize> FocusState<N> {
     ///
     /// `true` if focus was moved, `false` if no widgets are registered.
     pub fn focus_prev(&mut self) -> bool {
+        self.focus_prev_by(1)
+    }
+
+    /// Moves focus forward by the specified number of steps.
+    ///
+    /// This method advances focus by `steps` widgets, wrapping around to
+    /// the beginning as needed. Steps larger than the number of registered
+    /// widgets wrap around modulo the widget count (e.g. with 4 widgets,
+    /// `focus_next_by(5)` is equivalent to `focus_next_by(1)`). Any
+    /// pending trigger action is cleared.
+    ///
+    /// Calling this with `steps == 0` leaves the position unchanged but
+    /// still clears the pending trigger and returns `true` when widgets
+    /// are registered.
+    ///
+    /// # Arguments
+    ///
+    /// * `steps` - Number of steps to move forward
+    ///
+    /// # Returns
+    ///
+    /// `true` if the focus state is valid (at least one widget registered and
+    /// the current position is in range), `false` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use matrix_gui::prelude::*;
+    ///
+    /// let mut focus_state = FocusState::<8>::new();
+    /// // Skip ahead by 3 widgets at once
+    /// focus_state.focus_next_by(3);
+    /// ```
+    pub fn focus_next_by(&mut self, steps: usize) -> bool {
         self.tracker.trigger = None;
-        if self.tracker.size > self.tracker.pos {
-            if self.tracker.pos > 0 {
-                self.tracker.pos -= 1;
-            } else {
-                self.tracker.pos = self.tracker.size - 1;
-            }
-            true
-        } else {
-            false
+        let size = self.tracker.size;
+        if size == 0 || self.tracker.pos >= size {
+            return false;
         }
+        self.tracker.pos = (self.tracker.pos + steps) % size;
+        true
+    }
+
+    /// Moves focus backward by the specified number of steps.
+    ///
+    /// This method moves focus backward by `steps` widgets, wrapping around
+    /// to the end as needed. Steps larger than the number of registered
+    /// widgets wrap around modulo the widget count (e.g. with 4 widgets,
+    /// `focus_prev_by(5)` is equivalent to `focus_prev_by(1)`). Any
+    /// pending trigger action is cleared.
+    ///
+    /// Calling this with `steps == 0` leaves the position unchanged but
+    /// still clears the pending trigger and returns `true` when widgets
+    /// are registered.
+    ///
+    /// # Arguments
+    ///
+    /// * `steps` - Number of steps to move backward
+    ///
+    /// # Returns
+    ///
+    /// `true` if the focus state is valid (at least one widget registered and
+    /// the current position is in range), `false` otherwise.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use matrix_gui::prelude::*;
+    ///
+    /// let mut focus_state = FocusState::<8>::new();
+    /// // Jump back by 2 widgets at once
+    /// focus_state.focus_prev_by(2);
+    /// ```
+    pub fn focus_prev_by(&mut self, steps: usize) -> bool {
+        self.tracker.trigger = None;
+        let size = self.tracker.size;
+        if size == 0 || self.tracker.pos >= size {
+            return false;
+        }
+        // Add `size` before subtracting to avoid underflow when
+        // `steps % size` is larger than `pos`.
+        self.tracker.pos = (self.tracker.pos + size - (steps % size)) % size;
+        true
     }
 
     /// Triggers an action on the currently focused widget.
@@ -324,5 +387,115 @@ impl<'a> Focus<'a> {
         self.widgets_id
             .get(self.tracker.pos)
             .is_some_and(|&widget_id| widget_id == id as FocusID)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Helper that builds a `FocusState` with `count` registered widgets.
+    fn build_state<const N: usize>(count: usize) -> FocusState<N> {
+        let mut state = FocusState::<N>::new();
+        let mut focus = Focus::new(&mut state);
+        for i in 0..count {
+            assert!(focus.register_focus(i));
+        }
+        state
+    }
+
+    #[test]
+    fn focus_next_by_advances_multiple_steps() {
+        let mut state = build_state::<8>(4);
+        // pos == 0
+        assert!(state.focus_next_by(2));
+        assert_eq!(state.tracker.pos, 2);
+        assert!(state.focus_next_by(2));
+        assert_eq!(state.tracker.pos, 0, "expected wrap-around to 0");
+    }
+
+    #[test]
+    fn focus_next_by_wraps_when_steps_exceed_size() {
+        let mut state = build_state::<8>(4);
+        // (0 + 5) % 4 == 1
+        assert!(state.focus_next_by(5));
+        assert_eq!(state.tracker.pos, 1);
+    }
+
+    #[test]
+    fn focus_next_by_zero_is_noop_but_clears_trigger() {
+        let mut state = build_state::<8>(4);
+        state.trigger_focus();
+        assert!(state.tracker.trigger.is_some());
+        assert!(state.focus_next_by(0));
+        assert_eq!(state.tracker.pos, 0);
+        assert!(state.tracker.trigger.is_none(), "trigger must be cleared");
+    }
+
+    #[test]
+    fn focus_prev_by_decreases_multiple_steps() {
+        let mut state = build_state::<8>(4);
+        state.tracker.pos = 3;
+        assert!(state.focus_prev_by(2));
+        assert_eq!(state.tracker.pos, 1);
+    }
+
+    #[test]
+    fn focus_prev_by_wraps_at_zero() {
+        let mut state = build_state::<8>(4);
+        // pos == 0 → (0 + 4 - 1) % 4 == 3
+        assert!(state.focus_prev_by(1));
+        assert_eq!(state.tracker.pos, 3);
+        // pos == 3 → (3 + 4 - 2) % 4 == 1
+        assert!(state.focus_prev_by(2));
+        assert_eq!(state.tracker.pos, 1);
+    }
+
+    #[test]
+    fn focus_prev_by_wraps_when_steps_exceed_size() {
+        let mut state = build_state::<8>(4);
+        // (0 + 4 - (5 % 4)) % 4 == (0 + 4 - 1) % 4 == 3
+        assert!(state.focus_prev_by(5));
+        assert_eq!(state.tracker.pos, 3);
+    }
+
+    #[test]
+    fn single_step_methods_match_multi_step_with_one() {
+        // focus_next() must remain equivalent to focus_next_by(1).
+        let mut a = build_state::<8>(4);
+        let mut b = build_state::<8>(4);
+        for _ in 0..10 {
+            let ra = a.focus_next();
+            let rb = b.focus_next_by(1);
+            assert_eq!(ra, rb);
+            assert_eq!(a.tracker.pos, b.tracker.pos);
+        }
+
+        // focus_prev() must remain equivalent to focus_prev_by(1).
+        let mut a = build_state::<8>(4);
+        let mut b = build_state::<8>(4);
+        for _ in 0..10 {
+            let ra = a.focus_prev();
+            let rb = b.focus_prev_by(1);
+            assert_eq!(ra, rb);
+            assert_eq!(a.tracker.pos, b.tracker.pos);
+        }
+    }
+
+    #[test]
+    fn multi_step_returns_false_without_widgets() {
+        let mut state = FocusState::<4>::new();
+        assert!(!state.focus_next_by(2));
+        assert!(!state.focus_prev_by(2));
+    }
+
+    #[test]
+    fn multi_step_handles_single_widget() {
+        let mut state = build_state::<4>(1);
+        // Any movement on a single-widget chain stays at 0.
+        assert!(state.focus_next_by(3));
+        assert_eq!(state.tracker.pos, 0);
+        assert!(state.focus_prev_by(7));
+        assert_eq!(state.tracker.pos, 0);
     }
 }

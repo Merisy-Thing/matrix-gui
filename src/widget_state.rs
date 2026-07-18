@@ -101,8 +101,8 @@ impl RenderState {
         Self(Cell::new(status as u8))
     }
 
-    pub fn new_array<const N: usize>() -> [Self; N] {
-        core::array::from_fn(|_| RenderState::needs_redraw())
+    pub const fn new_array<const N: usize>() -> [Self; N] {
+        [const { RenderState::needs_redraw() }; N]
     }
 
     pub const fn needs_redraw() -> Self {

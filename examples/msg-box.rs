@@ -120,10 +120,14 @@ fn main() -> Result<(), core::convert::Infallible> {
             match evt {
                 SimulatorEvent::KeyUp { .. } => {}
                 SimulatorEvent::KeyDown { keycode, .. } => {
-                    if keycode == Keycode::Left || keycode == Keycode::UP {
+                    if keycode == Keycode::Left {
                         focus_state.focus_prev();
-                    } else if keycode == Keycode::Right || keycode == Keycode::DOWN {
+                    } else if keycode == Keycode::UP {
+                        focus_state.focus_prev_by(6);
+                    } else if keycode == Keycode::Right {
                         focus_state.focus_next();
+                    } else if keycode == Keycode::DOWN {
+                        focus_state.focus_next_by(6);
                     } else if keycode == Keycode::Return || keycode == Keycode::Space {
                         focus_state.trigger_focus();
                     }
