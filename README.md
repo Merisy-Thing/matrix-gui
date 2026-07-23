@@ -128,6 +128,25 @@ cargo run --features part --example scrollarea
 
 ## [Documents](https://docs.rs/matrix-gui/latest/matrix_gui/#modules)
 
+- [matrix-gui Resource Usage Analysis Report on Cortex-M3](assets/MatrixGUI_CM3_MemFlash_Report.md)
+
+| Widget | Dependent features | text | data | bss | FLASH | RAM | **Total ΔFLASH** | **Total ΔRAM** | **Marginal ΔFLASH** | **Marginal ΔRAM** |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `background` | (none) | 3668 | 0 | 0 | 3668 | 0 | **+8** | **0** | **+8** | **0** |
+| `bar` | (none) | 3752 | 0 | 0 | 3752 | 0 | **+92** | **0** | **+92** | **0** |
+| `label` | (none) | 5824 | 0 | 0 | 5824 | 0 | **+2164** | **0** | **+2164** | **0** |
+| `listbox` | (none) | 5024 | 0 | 0 | 5024 | 0 | **+1364** | **0** | **+1364** | **0** |
+| `plaintext` | (none) | 13080 | 0 | 0 | 13080 | 0 | **+9420** | **0** | **+9420** | **0** |
+| `staticimage` | (none) | 3664 | 0 | 0 | 3664 | 0 | **+4** | **0** | **+4** | **0** |
+| `staticline` | (none) | 3828 | 0 | 0 | 3828 | 0 | **+168** | **0** | **+168** | **0** |
+| `scrollarea` | scroll-area | 3684 | 0 | 0 | 3684 | 0 | **+24** | **0** | **+12** | **0** |
+| `button` | interaction | 7832 | 0 | 0 | 7832 | 0 | **+4172** | **0** | **+4160** | **0** |
+| `checkbox` | interaction | 7860 | 0 | 0 | 7860 | 0 | **+4200** | **0** | **+4188** | **0** |
+| `radiobutton` | interaction | 6884 | 0 | 0 | 6884 | 0 | **+3224** | **0** | **+3212** | **0** |
+| `slider` | interaction | 4692 | 0 | 0 | 4692 | 0 | **+1032** | **0** | **+1020** | **0** |
+| `choice` | popup+interaction | 8444 | 0 | 0 | 8444 | 0 | **+4784** | **0** | **+4704** | **0** |
+| `msgbox` | popup+interaction | 10712 | 0 | 0 | 10712 | 0 | **+7052** | **0** | **+6972** | **0** |
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE-MIT](LICENSE-MIT) file for details.
